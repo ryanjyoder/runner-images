@@ -9,7 +9,7 @@ build {
 
   provisioner "file" {
     destination = "${var.helper_script_folder}"
-    source      = "${path.root}/../scripts/helpers"
+    source      = "${path.root}/../scripts/helpers/"
   }
 
   provisioner "shell" {
