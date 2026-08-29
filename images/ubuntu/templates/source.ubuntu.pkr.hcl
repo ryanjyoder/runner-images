@@ -52,6 +52,8 @@ source "azure-arm" "image" {
 
 source "lxd" "image" {
   image          = "ubuntu:noble"
-  container_name = "packer-lxd"
-  skip_publish   = true
+  output_image = "ubuntu-noble-packer-test"
+  publish_properties = {
+    description = "test packer image with lxd"
+  }
 }
