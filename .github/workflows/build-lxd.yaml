@@ -1,9 +1,9 @@
 name: Build LXD Image
 
 on:
-#   push:
-#     branches:
-#       - lxd_tests
+  push:
+    branches:
+      - lxd_tests
   workflow_dispatch:
 
 env:
