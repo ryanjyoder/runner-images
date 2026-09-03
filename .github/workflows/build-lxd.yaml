@@ -32,4 +32,6 @@ jobs:
       - name: Run `packer validate`
         id: validate
         run: |
+            packer plugins install github.com/hashicorp/azure 2.2.1
+            packer plugins install github.com/hashicorp/lxd
             ./build-script.sh
