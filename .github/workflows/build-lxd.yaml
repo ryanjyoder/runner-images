@@ -1,0 +1,35 @@
+name: Build LXD Image
+
+on:
+#   push:
+#     branches:
+#       - lxd_tests
+  workflow_dispatch:
+
+env:
+  PRODUCT_VERSION: "1.10.0" # or: "latest"
+
+jobs:
+  packer:
+    runs-on: ubuntu-latest
+    name: Run Packer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+
+      - name: Setup LXD
+        uses: canonical/setup-lxd@[version]
+        with:
+          channel: latest/edge
+
+      - name: Run `packer validate`
+        id: validate
+        run: |
+            ./build-script.sh
