@@ -29,7 +29,7 @@ jobs:
         with:
           channel: latest/edge
 
-      - name: Run `packer validate`
+      - name: Run `packer build`
         id: validate
         run: |
             packer plugins install github.com/hashicorp/azure 2.2.1
