@@ -5,7 +5,7 @@
 ##  Caveat: Brew MUST NOT be used to install any tool during the image build to avoid dependencies, which may come along with the tool
 ################################################################################
 
-sudo -n trueo
+sudo -n true
 if [[ $? -ne 0 ]]; then
     echo "Sudo check failed!"
     echo "User: $USER"
