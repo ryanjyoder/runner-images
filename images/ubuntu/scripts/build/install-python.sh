@@ -11,6 +11,7 @@ source $HELPER_SCRIPTS/os.sh
 
 # Install Python, Python 3, pip, pip3
 apt-get install --no-install-recommends python3 python3-dev python3-pip python3-venv
+apt remove -y python3-packaging 
 
 if ! is_ubuntu22; then
 # allow user to continue using pip
