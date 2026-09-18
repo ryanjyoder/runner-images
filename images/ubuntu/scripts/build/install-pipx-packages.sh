@@ -22,6 +22,4 @@ for package in $pipx_packages; do
     fi
 done
 
-pipx ensurepath --global
-
 invoke_tests "Common" "PipxPackages"

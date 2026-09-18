@@ -28,6 +28,7 @@ export PIPX_HOME=/opt/pipx
 
 python3 -m pip install pipx
 python3 -m pipx ensurepath
+python3 -m pipx ensurepath --global
 
 # Update /etc/environment
 set_etc_environment_variable "PIPX_BIN_DIR" $PIPX_BIN_DIR
