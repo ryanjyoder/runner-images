@@ -187,6 +187,10 @@ provisioner "shell" {
     script          = "${path.root}/../scripts/build/list-dpkg.sh"
   }
 
+    provisioner "shell" {
+    inline           = ["echo '. /etc/environment' > /etc/profile.d/source_etc_environment.sh"]
+  }
+
   provisioner "shell" {
     execute_command   = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     expect_disconnect = true
@@ -198,10 +202,6 @@ provisioner "shell" {
     pause_before        = "5m0s"
     scripts             = ["${path.root}/../scripts/build/cleanup.sh"]
     start_retry_timeout = "10m"
-  }
-
-    provisioner "shell" {
-    inline           = ["echo '. /etc/environment' > /etc/profile.d/source_etc_environment.sh"]
   }
 
   provisioner "shell" {
