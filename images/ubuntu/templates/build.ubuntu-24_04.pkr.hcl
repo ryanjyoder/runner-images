@@ -201,7 +201,7 @@ provisioner "shell" {
   }
 
     provisioner "shell" {
-    inline           = ["echo '. /etc/environment > /etc/profile.d/source_etc_environment.sh'"]
+    inline           = ["echo '. /etc/environment' > /etc/profile.d/source_etc_environment.sh"]
   }
 
   provisioner "shell" {
