@@ -1,0 +1,46 @@
+name: Rebase fork onto upstream
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # Every night at 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  UPSTREAM_REPO: https://github.com/actions/runner-images.git
+  UPSTREAM_BRANCH: main
+  FORK_BRANCH: main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out fork
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.FORK_BRANCH }}
+          fetch-depth: 0
+
+      # This step is necessary to ensure that the Git user is configured for the rebase operation. Without this configuration, the rebase may fail due to missing user information.
+      # The user data is set to the GitHub Actions bot, which is a common practice for automated workflows. This allows the rebase operation to proceed without requiring manual intervention or additional configuration.
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream "$UPSTREAM_REPO"
+          git fetch upstream "$UPSTREAM_BRANCH"
+
+      - name: Rebase fork onto upstream
+        run: |
+          git checkout "$FORK_BRANCH"
+          git rebase "upstream/$UPSTREAM_BRANCH"
+
+      - name: Push rebased branch
+        run: |
+          git push --force-with-lease origin "$FORK_BRANCH"
