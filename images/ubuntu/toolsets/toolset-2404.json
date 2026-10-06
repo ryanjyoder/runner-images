@@ -147,6 +147,7 @@
             "tree",
             "tzdata",
             "upx",
+            "walinuxagent",
             "xvfb",
             "xz-utils",
             "zsync"
