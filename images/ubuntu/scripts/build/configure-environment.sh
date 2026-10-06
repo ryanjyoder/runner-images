@@ -20,9 +20,12 @@ mkdir -p /etc/skel/.config/configstore
 set_etc_environment_variable "XDG_CONFIG_HOME" '$HOME/.config'
 
 # Change waagent entries to use /mnt for swap file
-sed -i 's/ResourceDisk.Format=n/ResourceDisk.Format=y/g' /etc/waagent.conf
-sed -i 's/ResourceDisk.EnableSwap=n/ResourceDisk.EnableSwap=y/g' /etc/waagent.conf
-sed -i 's/ResourceDisk.SwapSizeMB=0/ResourceDisk.SwapSizeMB=4096/g' /etc/waagent.conf
+# only do this if waagent is installed, which is only on Azure VMs
+if [ -f /etc/waagent.conf ]; then
+    sed -i 's/ResourceDisk.Format=n/ResourceDisk.Format=y/g' /etc/waagent.conf
+    sed -i 's/ResourceDisk.EnableSwap=n/ResourceDisk.EnableSwap=y/g' /etc/waagent.conf
+    sed -i 's/ResourceDisk.SwapSizeMB=0/ResourceDisk.SwapSizeMB=4096/g' /etc/waagent.conf
+fi
 
 # Ephemeral-OS VMs have no Azure resource disk, so cloud-init's default /mnt mount waits ~90s
 # at boot for a device that never appears. Cap that wait via cloud-init, which rewrites
@@ -85,7 +88,11 @@ fi
 grub_dropin='/etc/default/grub.d/99-runner-performance.cfg'
 mkdir -p "$(dirname "$grub_dropin")"
 echo 'GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT rootflags=nobarrier,data=writeback,journal_async_commit,commit=30"' | tee "$grub_dropin"
-update-grub
+#  Only run update-grub if it's installed. On LXC containers, it may not be present, and we don't want to fail the build for that reason.
+if command -v update-grub >/dev/null 2>&1; then
+    update-grub
+fi
+
 
 # Create symlink for tests running
 chmod +x $HELPER_SCRIPTS/invoke-tests.sh
