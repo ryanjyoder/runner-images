@@ -1,3 +1,10 @@
+> [!WARNING]
+> This is a fork of the upstream actions/runner-images.
+> The `main` branch in this repository does not have a stable history. The 
+> branch will be rebased onto the upstream `main` on a regular basis.
+> This repository contains long lived feature branches. The `fork-sync` branch 
+> contains a script to rebase the relevant branches onto main.
+
 # GitHub Actions Runner Images
 
 **Table of Contents**
