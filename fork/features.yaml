@@ -1,0 +1,21 @@
+
+branches:
+  # This branch will never be merged upstream.
+  # It's currently a bit messy, and is a work in progress.
+  # However It does work.
+  # This branch contains:
+  #   - A new github actions workflow to build the image
+  #   - A script that wraps packer to make building easier.
+  #   - Updates to the packer build template to use the new lxd source.
+  - feature/lxd_source_enablement
+  
+
+ # installs walinuxagent via apt (azure vms already have this installed)
+  # also skips editing /etc/waagent.conf if it does not exist
+  - fix/walinuxagent
+
+  # fixes running as install as root. Currently runs a ubuntu, but should be runner
+  - fix/homebrew
+
+  # Uninstalls python3-packaging, because pip needs to install it
+  - fix/python 
