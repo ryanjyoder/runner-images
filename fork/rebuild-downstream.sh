@@ -27,9 +27,12 @@ for branch in $(yq -r '.branches[]' "$features_file"); do
   git switch "$branch"
   git rebase main
   git push --force-with-lease
+done
 
-  echo "Merging $branch into main"
   git switch main
+
+for branch in $(yq -r '.branches[]' "$features_file"); do
+  echo "Merging $branch into main"
   git merge --no-ff "$branch" -m "Merge $branch"
 done
 
