@@ -1,0 +1,56 @@
+name: Build LXD Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PRODUCT_VERSION: "1.10.0" # or: "latest"
+
+jobs:
+  packer:
+    runs-on: ubuntu-24.04
+    name: Run Packer
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: insightsengineering/disk-space-reclaimer@v1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+      - name: Setup LXD
+        uses: canonical/setup-lxd@main
+        with:
+          channel: latest/edge
+
+      - name: Run `packer build`
+        id: validate
+        run: |
+          packer plugins install github.com/hashicorp/azure 2.2.1
+          packer plugins install github.com/hashicorp/lxd
+          ./build-ubunt24-lxd.sh
+
+
+      - name: List available LXC images
+        run: lxc image list
+
+      - name: Export LXC image
+        run: |
+          mkdir -p artifacts
+          lxc image export local:ubuntu-noble-packer-test artifacts/
+
+      - name: Upload LXC image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runner-noble-lxc-image
+          path: artifacts/*
+          if-no-files-found: error
+          retention-days: 7
