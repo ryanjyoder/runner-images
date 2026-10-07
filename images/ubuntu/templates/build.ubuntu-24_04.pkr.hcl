@@ -18,6 +18,15 @@ build {
   }
 
   provisioner "shell" {
+  inline = [
+    "sudo useradd --create-home --shell /bin/bash runner",
+    "echo 'runner ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/runner",
+    "sudo chmod 0440 /etc/sudoers.d/runner",
+    "sudo visudo -cf /etc/sudoers.d/runner"
+  ]
+}
+
+  provisioner "shell" {
     environment_vars = ["HELPER_SCRIPTS=${var.helper_script_folder}","DEBIAN_FRONTEND=noninteractive"]
     execute_command  = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     scripts          = [
