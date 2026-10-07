@@ -1,5 +1,5 @@
 build {
-  sources = ["source.azure-arm.image"]
+  sources = ["source.lxd.image"]
   name = "ubuntu-24_04"
 
   provisioner "shell" {
@@ -9,13 +9,22 @@ build {
 
   provisioner "file" {
     destination = "${var.helper_script_folder}"
-    source      = "${path.root}/../scripts/helpers"
+    source      = "${path.root}/../scripts/helpers/"
   }
 
   provisioner "shell" {
     execute_command = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     script          = "${path.root}/../scripts/build/configure-apt-mock.sh"
   }
+
+  provisioner "shell" {
+  inline = [
+    "sudo useradd --create-home --shell /bin/bash runner",
+    "echo 'runner ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/runner",
+    "sudo chmod 0440 /etc/sudoers.d/runner",
+    "sudo visudo -cf /etc/sudoers.d/runner"
+  ]
+}
 
   provisioner "shell" {
     environment_vars = ["HELPER_SCRIPTS=${var.helper_script_folder}","DEBIAN_FRONTEND=noninteractive"]
@@ -201,8 +210,14 @@ provisioner "shell" {
   }
 
   provisioner "shell" {
+    execute_command     = "sudo sh -c '{{ .Vars }} {{ .Path }}'"
     environment_vars = ["IMAGE_VERSION=${var.image_version}", "INSTALLER_SCRIPT_FOLDER=${var.installer_script_folder}"]
-    inline           = ["pwsh -File ${var.image_folder}/SoftwareReport/Generate-SoftwareReport.ps1 -OutputDirectory ${var.image_folder}", "pwsh -File ${var.image_folder}/tests/RunAll-Tests.ps1 -OutputDirectory ${var.image_folder}"]
+    inline           = [
+      "set -a",
+      ". /etc/environment",
+      "set +a",
+      "pwsh -File ${var.image_folder}/SoftwareReport/Generate-SoftwareReport.ps1 -OutputDirectory ${var.image_folder}",
+      "pwsh -File ${var.image_folder}/tests/RunAll-Tests.ps1 -OutputDirectory ${var.image_folder}"]
   }
 
   provisioner "file" {
