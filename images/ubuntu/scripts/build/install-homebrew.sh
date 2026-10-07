@@ -10,7 +10,7 @@ source $HELPER_SCRIPTS/etc-environment.sh
 source $HELPER_SCRIPTS/install.sh
 
 # Install the Homebrew on Linux
-sudo -u ubuntu /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+sudo -u runner /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 # Invoke shellenv to make brew available during running session
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
