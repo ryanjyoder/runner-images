@@ -58,3 +58,13 @@ source "lxd" "image" {
     description = "test packer image with lxd"
   }
 }
+
+
+source "lxd" "ubuntu26" {
+  image          = "ubuntu:26.04"
+  container_name = "packer-lxd"
+  output_image = "ubuntu-26-runner"
+  publish_properties = {
+    description = "Github Actions Runner 26.04"
+  }
+}
