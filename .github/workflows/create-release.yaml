@@ -1,0 +1,83 @@
+name: Create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to release
+        required: true
+        type: string
+      version:
+        description: Release version (for example, v1.2.3)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Find latest successful build and download release artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch }}
+          BUILD_WORKFLOW: build.yml
+        run: |
+          set -euo pipefail
+
+          run_id="$(gh run list \
+            --workflow "$BUILD_WORKFLOW" \
+            --branch "$BRANCH" \
+            --status success \
+            --limit 1 \
+            --json databaseId \
+            --jq '.[0].databaseId')"
+
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "No successful run of $BUILD_WORKFLOW found on branch $BRANCH"
+            exit 1
+          fi
+
+          mkdir -p release-files
+
+          # Replace these with the artifact names your build workflow uploads.
+          for artifact in linux-build windows-build; do
+            gh run download "$run_id" \
+              --name "$artifact" \
+              --dir "release-files/$artifact"
+          done
+
+          find release-files -type f -print
+
+      - name: Create tag and GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -euo pipefail
+
+          # Fail rather than overwrite an existing tag.
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" >/dev/null 2>&1; then
+            echo "Tag $VERSION already exists"
+            exit 1
+          fi
+
+          git tag "$VERSION" "$GITHUB_SHA"
+          git push origin "$VERSION"
+
+          gh release create "$VERSION" release-files/**/* \
+            --title "$VERSION" \
+            --target "$GITHUB_SHA" \
+            --generate-notes
+
